@@ -1,10 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Smile, Heart, DollarSign, Users, MapPin, Calendar, Sun, Moon, Sparkles, Check, X, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState } from 'react'; // Removed useEffect as it's not used in this specific code
+import { Heart, DollarSign, Users, MapPin, Calendar, Sun, Moon, Sparkles, Check, X, Search, ChevronDown, ChevronUp } from 'lucide-react';
+
+// Define types for your trip configuration state
+interface TripConfig {
+  mood: string;
+  occasion: string;
+  budget: 'low' | 'medium' | 'high'; // Use a union type for budget
+  travelers: number;
+  interests: string[]; // Explicitly define as string array
+  activities: string[]; // Explicitly define as string array
+  location: string;
+  duration: 'weekend'; // Or a union if other durations are possible
+}
+
+// Define types for SectionHeader props
+interface SectionHeaderProps {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void; // A function that takes no arguments and returns nothing
+}
 
 // Main App Component
-const App = () => {
+const App: React.FC = () => {
   // State for trip configuration
-  const [tripConfig, setTripConfig] = useState({
+  const [tripConfig, setTripConfig] = useState<TripConfig>({
     mood: '',
     occasion: '',
     budget: 'medium', // low, medium, high
@@ -54,11 +73,11 @@ const App = () => {
   ];
 
   // Handler for updating trip configuration
-  const handleConfigChange = (key, value) => {
+  const handleConfigChange = (key: keyof TripConfig, value: string | number) => {
     setTripConfig(prev => ({ ...prev, [key]: value }));
   };
 
-  const toggleInterest = (interest) => {
+  const toggleInterest = (interest: string) => {
     setTripConfig(prev => {
       const newInterests = prev.interests.includes(interest)
         ? prev.interests.filter(i => i !== interest)
@@ -67,7 +86,7 @@ const App = () => {
     });
   };
 
-  const toggleActivity = (activity) => {
+  const toggleActivity = (activity: string) => {
     setTripConfig(prev => {
       const newActivities = prev.activities.includes(activity)
         ? prev.activities.filter(a => a !== activity)
@@ -149,7 +168,7 @@ const App = () => {
             {budgets.map(b => (
               <button
                 key={b.value}
-                onClick={() => handleConfigChange('budget', b.value)}
+                onClick={() => handleConfigChange('budget', b.value as TripConfig['budget'])} // Type assertion here
                 className={`flex flex-col items-center p-4 rounded-lg transition-all duration-300 ease-in-out
                   ${tripConfig.budget === b.value ? 'bg-purple-600 text-white shadow-lg scale-105' : 'bg-white text-purple-700 hover:bg-purple-100 hover:shadow-md'}
                   focus:outline-none focus:ring-4 focus:ring-purple-300`}
@@ -280,7 +299,7 @@ const App = () => {
 };
 
 // Reusable Section Header Component
-const SectionHeader = ({ title, isOpen, onToggle }) => (
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title, isOpen, onToggle }) => (
   <button
     className="w-full flex justify-between items-center bg-indigo-500 text-white p-4 rounded-t-lg shadow-md mb-4 hover:bg-indigo-600 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-300"
     onClick={onToggle}
